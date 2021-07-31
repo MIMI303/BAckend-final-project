@@ -138,26 +138,6 @@ public class ParentController {
 		return new ResponseEntity<RESTError>(new RESTError(4, "Parent not found."), HttpStatus.NOT_FOUND);
 	}
 	
-	//	vrati svu decu roditelja
-	
-	@Secured("ROLE_ADMIN")
-	@GetMapping(value = "/{parentId}/children/")
-	public ResponseEntity<?> getAllChildren(@PathVariable Integer parentId, HttpServletRequest request) {
-		if(parentRepository.existsById(parentId) && parentService.isActive(parentId)) {
-			Principal principal = request.getUserPrincipal();
-			if (!principal.getName().equals(parentRepository.findById(parentId).get().getUsername())
-					&& !adminRepository.existsByUsername(principal.getName())) {
-				throw new AuthorizationServiceException("Forbidden");
-			}
-			ParentEntity parent = parentRepository.findById(parentId).get();
-			List<StudentEntity> children = ((List<StudentEntity>) studentRepository.findByParent(parent))
-					.stream()
-						.filter(student -> !student.getDeleted().equals(true))
-						.collect(Collectors.toList());
-			return new ResponseEntity<List<StudentEntity>>(children, HttpStatus.OK);
-		}
-		return new ResponseEntity<RESTError>(new RESTError(4, "Parent not found."), HttpStatus.NOT_FOUND);
-	}
 	
 	public String createErrorMessage(BindingResult result) {
 		String errors = "";
